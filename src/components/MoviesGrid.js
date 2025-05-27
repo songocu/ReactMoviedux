@@ -1,8 +1,10 @@
 import React, {useState, useEffect} from "react";
 import '../styles.css';
+import MovieCard from "./MovieCard";
 
 export default function MoviesGrid() {
     const [movies, setMouvies] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
     
     useEffect ( () => {
         fetch("movies.json") 
@@ -10,20 +12,28 @@ export default function MoviesGrid() {
         .then(data => setMouvies(data));
     }, []);
 
+    const hadleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    }
+
+    const filteredMovies = movies.filter(movie =>
+        movie.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
-        <div className="movies-grid">
-            {
-                movies.map(movie => (
-                    <div key={movie.id} className="movie-card">
-                        <img src={`images/${movie.image}`} alt={movie.title}/>
-                        <div className="movie-card-info">
-                            <h3 className='movie-card-title'>{movie.title}</h3>
-                            <p className='movie-card-genre'>{movie.genre}</p>
-                            <p className='movie-card-rating'>{movie.rating}</p>
-                        </div>
-                    </div>
-                ))
-            }
+        <div>
+            <div>
+                <input type="text" 
+                    className="search-input"
+                    placeholder="Search movies..."
+                    value={searchTerm}
+                    onChange={hadleSearchChange}/>
+            </div>
+            <div className="movies-grid">
+                {filteredMovies.map(movie => (
+                    <MovieCard movie={movie} key={movie.id}></MovieCard>
+                ))}
+            </div>
         </div>
     );
 }
